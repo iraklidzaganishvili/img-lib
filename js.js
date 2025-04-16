@@ -1,4 +1,6 @@
 window.addEventListener('DOMContentLoaded', async () => {
+    console.log('DOM Content Loaded');
+    
     // Fetch data from data.json
     let data;
     try {
@@ -7,6 +9,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         data = await response.json();
+        console.log('Data loaded from data.json:', data);
     } catch (error) {
         console.error('Error loading data:', error);
         return;
@@ -14,9 +17,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Get current page from URL hash or default to portfolio1
     let currentPageId = window.location.hash.substring(1) || 'portfolio1';
-    
-    // Track if portrait has been clicked
-    let portraitClicked = false;
+    console.log('Current page ID:', currentPageId);
     
     // Populate navbar
     const navbarContainer = document.getElementById('navbar-container');
@@ -35,8 +36,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             // Set up click handler for navigation
             button.onclick = () => {
                 const targetPageId = item.link.substring(1); // Remove the # from the link
-                // Reset portrait clicked state when changing pages
-                portraitClicked = false;
                 loadPage(targetPageId);
                 window.location.hash = targetPageId;
             };
@@ -55,10 +54,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (data.portrait) {
         portrait.src = data.portrait.src;
         portrait.alt = data.portrait.alt;
+        console.log('Portrait set to:', data.portrait.src);
     }
 
     // Function to load page content
     function loadPage(pageId) {
+        console.log('Loading page:', pageId);
+        
         // Get the page data
         const pageData = data.pages[pageId];
         if (!pageData) {
@@ -101,6 +103,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 paragraph.style.borderRadius = '8px';
                 paragraph.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
                 textContainer.appendChild(paragraph);
+                console.log('Creator about text set');
             }
             
             return;
@@ -143,6 +146,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 
                 // Add the link to the portfolio container
                 portfolioContainer.appendChild(link);
+                console.log('Added portfolio image with link:', item.src, item.link);
             });
         }
 
@@ -160,6 +164,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             const paragraph = document.createElement('p');
             paragraph.textContent = pageData.about.text;
             textContainer.appendChild(paragraph);
+            console.log('About text set');
         }
 
         // Apply the layout logic
@@ -169,6 +174,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Function to apply layout logic
     function applyLayoutLogic() {
         let allImages = [...document.querySelectorAll('.img')].filter(img => img.id !== 'portrait');
+        console.log('All images found:', allImages.length);
         
         if (allImages.length > 0) {
             let mainBody = document.getElementById('main-body');
@@ -216,14 +222,9 @@ window.addEventListener('DOMContentLoaded', async () => {
             let mainBodyTop = mainBody.getBoundingClientRect().top + window.scrollY;
             let distanceFromMainBodyTop = portraitTop - mainBodyTop;
 
-            // Remove any existing click event listeners from portrait
-            const newPortrait = portrait.cloneNode(true);
-            portrait.parentNode.replaceChild(newPortrait, portrait);
-            
-            // Add click event listener to the new portrait element
-            newPortrait.addEventListener('click', () => {
-                portraitClicked = true;
+            portrait.addEventListener('click', () => {
                 allImages.forEach((img) => {
+                    console.log('Portrait clicked');
                     const link = img.parentElement;
                     if (link && link.tagName === 'A') {
                         link.style.position = 'static';
@@ -257,14 +258,14 @@ window.addEventListener('DOMContentLoaded', async () => {
                     text.style.marginRight = 'auto';
                 }
             });
+        } else {
+            console.warn('No images found to apply layout');
         }
     }
     
     // Listen for hash changes to handle browser back/forward navigation
     window.addEventListener('hashchange', () => {
         const newPageId = window.location.hash.substring(1) || 'portfolio1';
-        // Reset portrait clicked state when changing pages
-        portraitClicked = false;
         loadPage(newPageId);
     });
     

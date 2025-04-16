@@ -15,6 +15,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     
+    // Get current page from URL hash or default to portfolio1
+    let currentPageId = window.location.hash.substring(1) || 'portfolio1';
+    console.log('Current page ID:', currentPageId);
+    
     // Populate navbar
     const navbarContainer = document.getElementById('navbar-container');
     if (!navbarContainer) {
@@ -23,52 +27,17 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     
     if (data.navbar && data.navbar.length > 0) {
-        data.navbar.forEach((item, index) => {
+        data.navbar.forEach(item => {
             const button = document.createElement('button');
             button.className = 'btn btn-outline-success mr-2';
             button.type = 'button';
             button.textContent = item.text;
             
-            // Instead of redirecting, change the images when button is clicked
+            // Set up click handler for navigation
             button.onclick = () => {
-                console.log(`Navbar button ${index} clicked`);
-                
-                // Clear existing portfolio images
-                const portfolioContainer = document.getElementById('portfolio-container');
-                if (portfolioContainer) {
-                    portfolioContainer.innerHTML = '';
-                }
-                
-                // Load new images based on the button clicked
-                if (index === 0) {
-                    // First button - load original portfolio images
-                    if (data.portfolio && data.portfolio.length > 0) {
-                        data.portfolio.forEach(item => {
-                            const img = document.createElement('img');
-                            img.className = 'img';
-                            img.src = item.src;
-                            img.alt = item.alt;
-                            portfolioContainer.appendChild(img);
-                        });
-                    }
-                } else if (index === 1) {
-                    // Second button - load alternative images or different layout
-                    // You can customize this section to load different images or change the layout
-                    if (data.portfolio && data.portfolio.length > 0) {
-                        // For example, load the same images but in a different order
-                        const reversedPortfolio = [...data.portfolio].reverse();
-                        reversedPortfolio.forEach(item => {
-                            const img = document.createElement('img');
-                            img.className = 'img';
-                            img.src = item.src;
-                            img.alt = item.alt;
-                            portfolioContainer.appendChild(img);
-                        });
-                    }
-                }
-                
-                // Reapply the layout logic
-                applyLayoutLogic();
+                const targetPageId = item.link.substring(1); // Remove the # from the link
+                loadPage(targetPageId);
+                window.location.hash = targetPageId;
             };
             
             navbarContainer.appendChild(button);
@@ -88,39 +57,60 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.log('Portrait set to:', data.portrait.src);
     }
 
-    // Populate portfolio
-    const portfolioContainer = document.getElementById('portfolio-container');
-    if (!portfolioContainer) {
-        console.error('Portfolio container not found');
-        return;
+    // Function to load page content
+    function loadPage(pageId) {
+        console.log('Loading page:', pageId);
+        
+        // Get the page data
+        const pageData = data.pages[pageId];
+        if (!pageData) {
+            console.error('Page not found:', pageId);
+            return;
+        }
+        
+        // Populate portfolio
+        const portfolioContainer = document.getElementById('portfolio-container');
+        if (!portfolioContainer) {
+            console.error('Portfolio container not found');
+            return;
+        }
+        
+        // Clear existing portfolio
+        portfolioContainer.innerHTML = '';
+        
+        if (pageData.portfolio && pageData.portfolio.length > 0) {
+            pageData.portfolio.forEach(item => {
+                const img = document.createElement('img');
+                img.className = 'img';
+                img.src = item.src;
+                img.alt = item.alt;
+                portfolioContainer.appendChild(img);
+                console.log('Added portfolio image:', item.src);
+            });
+        }
+
+        // Set about text
+        const textContainer = document.getElementById('text');
+        if (!textContainer) {
+            console.error('Text container not found');
+            return;
+        }
+        
+        // Clear existing text
+        textContainer.innerHTML = '';
+        
+        if (pageData.about && pageData.about.text) {
+            const paragraph = document.createElement('p');
+            paragraph.textContent = pageData.about.text;
+            textContainer.appendChild(paragraph);
+            console.log('About text set');
+        }
+
+        // Apply the layout logic
+        applyLayoutLogic();
     }
     
-    if (data.portfolio && data.portfolio.length > 0) {
-        data.portfolio.forEach(item => {
-            const img = document.createElement('img');
-            img.className = 'img';
-            img.src = item.src;
-            img.alt = item.alt;
-            portfolioContainer.appendChild(img);
-            console.log('Added portfolio image:', item.src);
-        });
-    }
-
-    // Set about text
-    const textContainer = document.getElementById('text');
-    if (!textContainer) {
-        console.error('Text container not found');
-        return;
-    }
-    
-    if (data.about && data.about.text) {
-        const paragraph = document.createElement('p');
-        paragraph.textContent = data.about.text;
-        textContainer.appendChild(paragraph);
-        console.log('About text set');
-    }
-
-    // Apply the layout logic
+    // Function to apply layout logic
     function applyLayoutLogic() {
         let allImages = [...document.querySelectorAll('.img')].filter(img => img.id !== 'portrait');
         console.log('All images found:', allImages.length);
@@ -203,6 +193,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
-    // Apply initial layout
-    applyLayoutLogic();
+    // Listen for hash changes to handle browser back/forward navigation
+    window.addEventListener('hashchange', () => {
+        const newPageId = window.location.hash.substring(1) || 'portfolio1';
+        loadPage(newPageId);
+    });
+    
+    // Load initial page
+    loadPage(currentPageId);
 });

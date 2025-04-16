@@ -23,14 +23,54 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     
     if (data.navbar && data.navbar.length > 0) {
-        data.navbar.forEach(item => {
+        data.navbar.forEach((item, index) => {
             const button = document.createElement('button');
             button.className = 'btn btn-outline-success mr-2';
             button.type = 'button';
             button.textContent = item.text;
-            if (item.link) {
-                button.onclick = () => window.location.href = item.link;
-            }
+            
+            // Instead of redirecting, change the images when button is clicked
+            button.onclick = () => {
+                console.log(`Navbar button ${index} clicked`);
+                
+                // Clear existing portfolio images
+                const portfolioContainer = document.getElementById('portfolio-container');
+                if (portfolioContainer) {
+                    portfolioContainer.innerHTML = '';
+                }
+                
+                // Load new images based on the button clicked
+                if (index === 0) {
+                    // First button - load original portfolio images
+                    if (data.portfolio && data.portfolio.length > 0) {
+                        data.portfolio.forEach(item => {
+                            const img = document.createElement('img');
+                            img.className = 'img';
+                            img.src = item.src;
+                            img.alt = item.alt;
+                            portfolioContainer.appendChild(img);
+                        });
+                    }
+                } else if (index === 1) {
+                    // Second button - load alternative images or different layout
+                    // You can customize this section to load different images or change the layout
+                    if (data.portfolio && data.portfolio.length > 0) {
+                        // For example, load the same images but in a different order
+                        const reversedPortfolio = [...data.portfolio].reverse();
+                        reversedPortfolio.forEach(item => {
+                            const img = document.createElement('img');
+                            img.className = 'img';
+                            img.src = item.src;
+                            img.alt = item.alt;
+                            portfolioContainer.appendChild(img);
+                        });
+                    }
+                }
+                
+                // Reapply the layout logic
+                applyLayoutLogic();
+            };
+            
             navbarContainer.appendChild(button);
         });
     }
@@ -81,83 +121,88 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Apply the layout logic
-    let allImages = [...document.querySelectorAll('.img')].filter(img => img.id !== 'portrait');
-    console.log('All images found:', allImages.length);
-    
-    if (allImages.length > 0) {
-        let mainBody = document.getElementById('main-body');
-        if (!mainBody) {
-            console.error('Main body element not found');
-            return;
-        }
+    function applyLayoutLogic() {
+        let allImages = [...document.querySelectorAll('.img')].filter(img => img.id !== 'portrait');
+        console.log('All images found:', allImages.length);
+        
+        if (allImages.length > 0) {
+            let mainBody = document.getElementById('main-body');
+            if (!mainBody) {
+                console.error('Main body element not found');
+                return;
+            }
 
-        let mainBodyRect = mainBody.getBoundingClientRect();
-        let mainBodyHeight = mainBodyRect.height;
-        let topOffset = mainBodyRect.top + window.scrollY;
+            let mainBodyRect = mainBody.getBoundingClientRect();
+            let mainBodyHeight = mainBodyRect.height;
+            let topOffset = mainBodyRect.top + window.scrollY;
 
-        let imageHeight = allImages[0].offsetHeight;
-        let portraitHeight = portrait.offsetHeight;
+            let imageHeight = allImages[0].offsetHeight;
+            let portraitHeight = portrait.offsetHeight;
 
-        portrait.style.top = topOffset + (mainBodyHeight - portraitHeight) / 2 + 'px';
+            portrait.style.top = topOffset + (mainBodyHeight - portraitHeight) / 2 + 'px';
 
-        let stAngle = -allImages.length * 8;
-        let endAngl = allImages.length * 8;
+            let stAngle = -allImages.length * 8;
+            let endAngl = allImages.length * 8;
 
-        let stPos = topOffset + mainBodyHeight / 2 - imageHeight - 100;
-        let endPos = topOffset + mainBodyHeight / 2 + imageHeight - 100;
+            let stPos = topOffset + mainBodyHeight / 2 - imageHeight - 100;
+            let endPos = topOffset + mainBodyHeight / 2 + imageHeight - 100;
 
-        allImages.forEach((img, index) => {
-            let rotation = stAngle + (index * (endAngl - stAngle) / (allImages.length - 1));
-            let position = stPos + (index * (endPos - stPos) / (allImages.length - 1));
+            allImages.forEach((img, index) => {
+                let rotation = stAngle + (index * (endAngl - stAngle) / (allImages.length - 1));
+                let position = stPos + (index * (endPos - stPos) / (allImages.length - 1));
 
-            img.style.top = position + 'px';
-            img.style.left = '11rem';
-            img.style.rotate = rotation + 'deg';
-        });
+                img.style.top = position + 'px';
+                img.style.left = '11rem';
+                img.style.rotate = rotation + 'deg';
+            });
 
-        allImages.forEach(img => {
-            img.addEventListener('click', () => {
-                console.log('Image clicked');
-                const carousel = document.getElementById('carousel-section');
-                if (carousel) {
-                    carousel.classList.remove('hidden-el');
+            allImages.forEach(img => {
+                img.addEventListener('click', () => {
+                    console.log('Image clicked');
+                    const carousel = document.getElementById('carousel-section');
+                    if (carousel) {
+                        carousel.classList.remove('hidden-el');
+                    }
+                });
+            });
+
+            let portraitTop = portrait.getBoundingClientRect().top + window.scrollY;
+            let mainBodyTop = mainBody.getBoundingClientRect().top + window.scrollY;
+            let distanceFromMainBodyTop = portraitTop - mainBodyTop;
+
+            portrait.addEventListener('click', () => {
+                allImages.forEach((img) => {
+                    console.log('Portrait clicked');
+                    img.style.position = 'static';
+                    img.style.rotate = '0deg';
+                    img.style.marginLeft = '2rem';
+                    img.style.marginBottom = '2rem';
+                });
+
+                let flexbox = document.querySelector('.flexbox');
+                if (flexbox) {
+                    flexbox.style.height = 'min-content';
+                    flexbox.style.marginTop = distanceFromMainBodyTop + 'px';
+                }
+
+                let container = document.querySelector('.my-container');
+                if (container) {
+                    container.style.width = 'inherit';
+                }
+
+                let text = document.getElementById('text');
+                if (text) {
+                    text.style.marginTop = '3rem';
+                    text.style.maxWidth = '40rem';
+                    text.style.marginLeft = 'auto';
+                    text.style.marginRight = 'auto';
                 }
             });
-        });
-
-        let portraitTop = portrait.getBoundingClientRect().top + window.scrollY;
-        let mainBodyTop = mainBody.getBoundingClientRect().top + window.scrollY;
-        let distanceFromMainBodyTop = portraitTop - mainBodyTop;
-
-        portrait.addEventListener('click', () => {
-            allImages.forEach((img) => {
-                console.log('Portrait clicked');
-                img.style.position = 'static';
-                img.style.rotate = '0deg';
-                img.style.marginLeft = '2rem';
-                img.style.marginBottom = '2rem';
-            });
-
-            let flexbox = document.querySelector('.flexbox');
-            if (flexbox) {
-                flexbox.style.height = 'min-content';
-                flexbox.style.marginTop = distanceFromMainBodyTop + 'px';
-            }
-
-            let container = document.querySelector('.my-container');
-            if (container) {
-                container.style.width = 'inherit';
-            }
-
-            let text = document.getElementById('text');
-            if (text) {
-                text.style.marginTop = '3rem';
-                text.style.maxWidth = '40rem';
-                text.style.marginLeft = 'auto';
-                text.style.marginRight = 'auto';
-            }
-        });
-    } else {
-        console.warn('No images found to apply layout');
+        } else {
+            console.warn('No images found to apply layout');
+        }
     }
+    
+    // Apply initial layout
+    applyLayoutLogic();
 });

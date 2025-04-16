@@ -68,8 +68,58 @@ window.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        // Populate portfolio
+        // Handle the creator page differently
+        if (pageId === 'creator') {
+            // Hide the portfolio container and portrait for the creator page
+            const portfolioContainer = document.getElementById('portfolio-container');
+            if (portfolioContainer) {
+                portfolioContainer.innerHTML = '';
+                portfolioContainer.style.display = 'none';
+            }
+            
+            if (portrait) {
+                portrait.style.display = 'none';
+            }
+            
+            // Set about text
+            const textContainer = document.getElementById('text');
+            if (!textContainer) {
+                console.error('Text container not found');
+                return;
+            }
+            
+            // Clear existing text
+            textContainer.innerHTML = '';
+            
+            if (pageData.about && pageData.about.text) {
+                const paragraph = document.createElement('p');
+                paragraph.textContent = pageData.about.text;
+                paragraph.style.fontSize = '1.2rem';
+                paragraph.style.lineHeight = '1.6';
+                paragraph.style.maxWidth = '800px';
+                paragraph.style.margin = '2rem auto';
+                paragraph.style.padding = '2rem';
+                paragraph.style.backgroundColor = '#f8f9fa';
+                paragraph.style.borderRadius = '8px';
+                paragraph.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                textContainer.appendChild(paragraph);
+                console.log('Creator about text set');
+            }
+            
+            return;
+        }
+        
+        // For portfolio pages, show the portfolio container and portrait
         const portfolioContainer = document.getElementById('portfolio-container');
+        if (portfolioContainer) {
+            portfolioContainer.style.display = 'block';
+        }
+        
+        if (portrait) {
+            portrait.style.display = 'block';
+        }
+        
+        // Populate portfolio
         if (!portfolioContainer) {
             console.error('Portfolio container not found');
             return;

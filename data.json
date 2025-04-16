@@ -11,6 +11,10 @@
     {
       "text": "Portfolio 3",
       "link": "#portfolio3"
+    },
+    {
+      "text": "Creator",
+      "link": "#creator"
     }
   ],
   "portrait": {
@@ -97,6 +101,11 @@
       ],
       "about": {
         "text": "This is Portfolio 3. Ut enim ad minim veniam, quis nostrud exercitation ullamco."
+      }
+    },
+    "creator": {
+      "about": {
+        "text": "About the Creator: This website was created by a passionate developer who loves photography and web design. The goal was to create a dynamic portfolio gallery that showcases different collections of images in an interactive way."
       }
     }
   }

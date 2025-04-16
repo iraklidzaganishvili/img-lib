@@ -5,6 +5,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     let data;
     try {
         const response = await fetch('data.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         data = await response.json();
         console.log('Data loaded from data.json:', data);
     } catch (error) {
@@ -14,7 +17,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Populate navbar
     const navbarContainer = document.getElementById('navbar-container');
-    console.log('Navbar container:', navbarContainer);
+    if (!navbarContainer) {
+        console.error('Navbar container not found');
+        return;
+    }
     
     if (data.navbar && data.navbar.length > 0) {
         data.navbar.forEach(item => {
@@ -22,13 +28,19 @@ window.addEventListener('DOMContentLoaded', async () => {
             button.className = 'btn btn-outline-success mr-2';
             button.type = 'button';
             button.textContent = item.text;
+            if (item.link) {
+                button.onclick = () => window.location.href = item.link;
+            }
             navbarContainer.appendChild(button);
         });
     }
 
     // Set portrait
     const portrait = document.getElementById('portrait');
-    console.log('Portrait element:', portrait);
+    if (!portrait) {
+        console.error('Portrait element not found');
+        return;
+    }
     
     if (data.portrait) {
         portrait.src = data.portrait.src;
@@ -38,7 +50,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // Populate portfolio
     const portfolioContainer = document.getElementById('portfolio-container');
-    console.log('Portfolio container:', portfolioContainer);
+    if (!portfolioContainer) {
+        console.error('Portfolio container not found');
+        return;
+    }
     
     if (data.portfolio && data.portfolio.length > 0) {
         data.portfolio.forEach(item => {
@@ -53,7 +68,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // Set about text
     const textContainer = document.getElementById('text');
-    console.log('Text container:', textContainer);
+    if (!textContainer) {
+        console.error('Text container not found');
+        return;
+    }
     
     if (data.about && data.about.text) {
         const paragraph = document.createElement('p');
@@ -62,13 +80,16 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.log('About text set');
     }
 
-    // Apply the original layout logic
+    // Apply the layout logic
     let allImages = [...document.querySelectorAll('.img')].filter(img => img.id !== 'portrait');
     console.log('All images found:', allImages.length);
     
     if (allImages.length > 0) {
         let mainBody = document.getElementById('main-body');
-        console.log('Main body element:', mainBody);
+        if (!mainBody) {
+            console.error('Main body element not found');
+            return;
+        }
 
         let mainBodyRect = mainBody.getBoundingClientRect();
         let mainBodyHeight = mainBodyRect.height;
@@ -94,14 +115,13 @@ window.addEventListener('DOMContentLoaded', async () => {
             img.style.rotate = rotation + 'deg';
         });
 
-        let incport = [...allImages, portrait];
-
         allImages.forEach(img => {
             img.addEventListener('click', () => {
-                console.log('clicked');
-                // let carousel = document.getElementById('carouselExampleDark');
-                // carousel.classList.remove('hidden-el');
-                // document.getElementById('background').style.visibility = 'visible';
+                console.log('Image clicked');
+                const carousel = document.getElementById('carousel-section');
+                if (carousel) {
+                    carousel.classList.remove('hidden-el');
+                }
             });
         });
 
@@ -110,8 +130,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         let distanceFromMainBodyTop = portraitTop - mainBodyTop;
 
         portrait.addEventListener('click', () => {
-            allImages.forEach((img, index) => {
-                console.log('clicked port');
+            allImages.forEach((img) => {
+                console.log('Portrait clicked');
                 img.style.position = 'static';
                 img.style.rotate = '0deg';
                 img.style.marginLeft = '2rem';
@@ -119,17 +139,25 @@ window.addEventListener('DOMContentLoaded', async () => {
             });
 
             let flexbox = document.querySelector('.flexbox');
-            flexbox.style.height = 'min-content';
-            flexbox.style.marginTop = distanceFromMainBodyTop + 'px';
-            document.querySelector('.my-container').style.width = 'inherit';
+            if (flexbox) {
+                flexbox.style.height = 'min-content';
+                flexbox.style.marginTop = distanceFromMainBodyTop + 'px';
+            }
+
+            let container = document.querySelector('.my-container');
+            if (container) {
+                container.style.width = 'inherit';
+            }
 
             let text = document.getElementById('text');
-            text.style.marginTop = '3rem';
-            text.style.maxWidth = '40rem';
-            text.style.marginLeft = 'auto';
-            text.style.marginRight = 'auto';
+            if (text) {
+                text.style.marginTop = '3rem';
+                text.style.maxWidth = '40rem';
+                text.style.marginLeft = 'auto';
+                text.style.marginRight = 'auto';
+            }
         });
     } else {
-        console.error('No images found to apply layout');
+        console.warn('No images found to apply layout');
     }
 });

@@ -130,12 +130,23 @@ window.addEventListener('DOMContentLoaded', async () => {
         
         if (pageData.portfolio && pageData.portfolio.length > 0) {
             pageData.portfolio.forEach(item => {
+                // Create a link element
+                const link = document.createElement('a');
+                link.href = item.link || '#';
+                link.target = '_blank'; // Open in a new tab
+                
+                // Create the image element
                 const img = document.createElement('img');
                 img.className = 'img';
                 img.src = item.src;
                 img.alt = item.alt;
-                portfolioContainer.appendChild(img);
-                console.log('Added portfolio image:', item.src);
+                
+                // Add the image to the link
+                link.appendChild(img);
+                
+                // Add the link to the portfolio container
+                portfolioContainer.appendChild(link);
+                console.log('Added portfolio image with link:', item.src, item.link);
             });
         }
 
@@ -191,9 +202,20 @@ window.addEventListener('DOMContentLoaded', async () => {
                 let rotation = stAngle + (index * (endAngl - stAngle) / (allImages.length - 1));
                 let position = stPos + (index * (endPos - stPos) / (allImages.length - 1));
 
-                img.style.top = position + 'px';
-                img.style.left = '11rem';
-                img.style.rotate = rotation + 'deg';
+                // Apply styles to the parent link element
+                const link = img.parentElement;
+                if (link && link.tagName === 'A') {
+                    link.style.position = 'absolute';
+                    link.style.top = position + 'px';
+                    link.style.left = '11rem';
+                    link.style.transform = `rotate(${rotation}deg)`;
+                    link.style.display = 'block';
+                    link.style.textDecoration = 'none';
+                } else {
+                    img.style.top = position + 'px';
+                    img.style.left = '11rem';
+                    img.style.rotate = rotation + 'deg';
+                }
             });
 
             let portraitTop = portrait.getBoundingClientRect().top + window.scrollY;
@@ -203,10 +225,18 @@ window.addEventListener('DOMContentLoaded', async () => {
             portrait.addEventListener('click', () => {
                 allImages.forEach((img) => {
                     console.log('Portrait clicked');
-                    img.style.position = 'static';
-                    img.style.rotate = '0deg';
-                    img.style.marginLeft = '2rem';
-                    img.style.marginBottom = '2rem';
+                    const link = img.parentElement;
+                    if (link && link.tagName === 'A') {
+                        link.style.position = 'static';
+                        link.style.transform = 'rotate(0deg)';
+                        link.style.marginLeft = '2rem';
+                        link.style.marginBottom = '2rem';
+                    } else {
+                        img.style.position = 'static';
+                        img.style.rotate = '0deg';
+                        img.style.marginLeft = '2rem';
+                        img.style.marginBottom = '2rem';
+                    }
                 });
 
                 let flexbox = document.querySelector('.flexbox');

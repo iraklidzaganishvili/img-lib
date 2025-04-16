@@ -19,6 +19,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     let currentPageId = window.location.hash.substring(1) || 'portfolio1';
     console.log('Current page ID:', currentPageId);
     
+    // Track if portrait has been clicked
+    let portraitClicked = false;
+    
     // Populate navbar
     const navbarContainer = document.getElementById('navbar-container');
     if (!navbarContainer) {
@@ -36,6 +39,8 @@ window.addEventListener('DOMContentLoaded', async () => {
             // Set up click handler for navigation
             button.onclick = () => {
                 const targetPageId = item.link.substring(1); // Remove the # from the link
+                // Reset portrait clicked state when changing pages
+                portraitClicked = false;
                 loadPage(targetPageId);
                 window.location.hash = targetPageId;
             };
@@ -222,7 +227,13 @@ window.addEventListener('DOMContentLoaded', async () => {
             let mainBodyTop = mainBody.getBoundingClientRect().top + window.scrollY;
             let distanceFromMainBodyTop = portraitTop - mainBodyTop;
 
-            portrait.addEventListener('click', () => {
+            // Remove any existing click event listeners from portrait
+            const newPortrait = portrait.cloneNode(true);
+            portrait.parentNode.replaceChild(newPortrait, portrait);
+            
+            // Add click event listener to the new portrait element
+            newPortrait.addEventListener('click', () => {
+                portraitClicked = true;
                 allImages.forEach((img) => {
                     console.log('Portrait clicked');
                     const link = img.parentElement;
@@ -266,6 +277,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Listen for hash changes to handle browser back/forward navigation
     window.addEventListener('hashchange', () => {
         const newPageId = window.location.hash.substring(1) || 'portfolio1';
+        // Reset portrait clicked state when changing pages
+        portraitClicked = false;
         loadPage(newPageId);
     });
     

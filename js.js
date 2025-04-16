@@ -1,6 +1,4 @@
 window.addEventListener('DOMContentLoaded', async () => {
-    console.log('DOM Content Loaded');
-    
     // Fetch data from data.json
     let data;
     try {
@@ -9,7 +7,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         data = await response.json();
-        console.log('Data loaded from data.json:', data);
     } catch (error) {
         console.error('Error loading data:', error);
         return;
@@ -17,7 +14,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Get current page from URL hash or default to portfolio1
     let currentPageId = window.location.hash.substring(1) || 'portfolio1';
-    console.log('Current page ID:', currentPageId);
     
     // Track if portrait has been clicked
     let portraitClicked = false;
@@ -59,13 +55,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (data.portrait) {
         portrait.src = data.portrait.src;
         portrait.alt = data.portrait.alt;
-        console.log('Portrait set to:', data.portrait.src);
     }
 
     // Function to load page content
     function loadPage(pageId) {
-        console.log('Loading page:', pageId);
-        
         // Get the page data
         const pageData = data.pages[pageId];
         if (!pageData) {
@@ -108,7 +101,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 paragraph.style.borderRadius = '8px';
                 paragraph.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
                 textContainer.appendChild(paragraph);
-                console.log('Creator about text set');
             }
             
             return;
@@ -151,7 +143,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 
                 // Add the link to the portfolio container
                 portfolioContainer.appendChild(link);
-                console.log('Added portfolio image with link:', item.src, item.link);
             });
         }
 
@@ -169,7 +160,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             const paragraph = document.createElement('p');
             paragraph.textContent = pageData.about.text;
             textContainer.appendChild(paragraph);
-            console.log('About text set');
         }
 
         // Apply the layout logic
@@ -179,7 +169,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Function to apply layout logic
     function applyLayoutLogic() {
         let allImages = [...document.querySelectorAll('.img')].filter(img => img.id !== 'portrait');
-        console.log('All images found:', allImages.length);
         
         if (allImages.length > 0) {
             let mainBody = document.getElementById('main-body');
@@ -235,7 +224,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             newPortrait.addEventListener('click', () => {
                 portraitClicked = true;
                 allImages.forEach((img) => {
-                    console.log('Portrait clicked');
                     const link = img.parentElement;
                     if (link && link.tagName === 'A') {
                         link.style.position = 'static';
@@ -269,8 +257,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                     text.style.marginRight = 'auto';
                 }
             });
-        } else {
-            console.warn('No images found to apply layout');
         }
     }
     

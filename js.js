@@ -146,16 +146,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 img.style.rotate = rotation + 'deg';
             });
 
-            allImages.forEach(img => {
-                img.addEventListener('click', () => {
-                    console.log('Image clicked');
-                    const carousel = document.getElementById('carousel-section');
-                    if (carousel) {
-                        carousel.classList.remove('hidden-el');
-                    }
-                });
-            });
-
             let portraitTop = portrait.getBoundingClientRect().top + window.scrollY;
             let mainBodyTop = mainBody.getBoundingClientRect().top + window.scrollY;
             let distanceFromMainBodyTop = portraitTop - mainBodyTop;
